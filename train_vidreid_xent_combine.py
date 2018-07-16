@@ -89,7 +89,7 @@ parser.add_argument('--start-eval', type=int, default=0,
 parser.add_argument('--save-dir', type=str, default='log')
 parser.add_argument('--use-cpu', action='store_true',
                     help="use cpu")
-parser.add_argument('--gpu-devices', default='0', type=str,
+parser.add_argument('--gpu-devices', default='0,1,2,3', type=str,
                     help='gpu device ids for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
@@ -104,7 +104,7 @@ def main():
         use_gpu = torch.cuda.is_available()
         if args.use_cpu: use_gpu = False
 
-        name = 'resnet50-xent-htri-combine_{}'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+        name = 'resnet50-xent-combine_{}'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
         if not args.evaluate:
             sys.stdout = Logger(osp.join(args.save_dir, 'log-train-'+name+'.txt'))
         else:
@@ -138,8 +138,17 @@ def main():
 
         # decompose tracklets into images
         for img_paths, pid, camid in dataset.train:
+            # 'ilidsvid' 150, 'prid2011' 89, 'mars' 625, 'dukemtmcvidreid' 702
+            if args.dataset == 'prid2011':
+                pid += 150
+            elif args.dataset == 'mars':
+                pid += 150+89
+            elif args.dataset == 'dukemtmcvidreid':
+                pid += 150+89+625
             for img_path in img_paths:
                 new_train.append((img_path, pid, camid))
+
+    num_train_pids = 150+89+625+702
 
     trainloader = DataLoader(
         ImageDataset(new_train, transform=transform_train),
@@ -160,10 +169,10 @@ def main():
     )
 
     print("Initializing model: {}".format(args.arch))
-    model = models.init_model(name=args.arch, num_classes=dataset.num_train_pids, loss={'xent'})
+    model = models.init_model(name=args.arch, num_classes=num_train_pids, loss={'xent'})
     print("Model size: {:.3f} M".format(count_num_param(model)))
 
-    criterion = CrossEntropyLabelSmooth(num_classes=dataset.num_train_pids, use_gpu=use_gpu)
+    criterion = CrossEntropyLabelSmooth(num_classes=num_train_pids, use_gpu=use_gpu)
     optimizer = init_optim(args.optim, model.parameters(), args.lr, args.weight_decay)
     scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=args.stepsize, gamma=args.gamma)
     start_epoch = args.start_epoch

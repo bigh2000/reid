@@ -91,7 +91,7 @@ parser.add_argument('--start-eval', type=int, default=0,
 parser.add_argument('--save-dir', type=str, default='log')
 parser.add_argument('--use-cpu', action='store_true',
                     help="use cpu")
-parser.add_argument('--gpu-devices', default='0', type=str,
+parser.add_argument('--gpu-devices', default='0,1,2,3', type=str,
                     help='gpu device ids for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()

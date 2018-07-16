@@ -90,7 +90,7 @@ parser.add_argument('--start-eval', type=int, default=0,
 parser.add_argument('--save-dir', type=str, default='log')
 parser.add_argument('--use-cpu', action='store_true',
                     help="use cpu")
-parser.add_argument('--gpu-devices', default='0', type=str,
+parser.add_argument('--gpu-devices', default='0,1,2,3', type=str,
                     help='gpu device ids for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
@@ -102,7 +102,7 @@ def main():
     use_gpu = torch.cuda.is_available()
     if args.use_cpu: use_gpu = False
 
-    name = 'resnet50-xent-htri-'+ds+'_{}'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    name = 'resnet50-xent-'+ds+'_{}'.format(datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
     if not args.evaluate:
         sys.stdout = Logger(osp.join(args.save_dir, 'log-train-'+name+'.txt'))
     else:

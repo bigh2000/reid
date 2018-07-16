@@ -79,7 +79,7 @@ parser.add_argument('--print-freq', type=int, default=10,
                     help="print frequency")
 parser.add_argument('--seed', type=int, default=1,
                     help="manual seed")
-parser.add_argument('--resume', type=str, default='saved-models/vdo-resnet50-xent-'+ds+'_best.pth.tar', metavar='PATH')
+parser.add_argument('--resume', type=str, default='saved-models/vdo-resnet50-xent-htri-'+ds+'_best.pth.tar', metavar='PATH')
 parser.add_argument('--load-weights', type=str, default='',
                     help="load pretrained weights but ignores layers that don't match in size")
 parser.add_argument('--evaluate', action='store_true',
@@ -91,7 +91,7 @@ parser.add_argument('--start-eval', type=int, default=0,
 parser.add_argument('--save-dir', type=str, default='log')
 parser.add_argument('--use-cpu', action='store_true',
                     help="use cpu")
-parser.add_argument('--gpu-devices', default='0', type=str,
+parser.add_argument('--gpu-devices', default='0,1,2,3', type=str,
                     help='gpu device ids for CUDA_VISIBLE_DEVICES')
 
 args = parser.parse_args()
